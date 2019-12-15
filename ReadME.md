@@ -50,38 +50,38 @@ Workflow Details
 
 ![](Registration.png)
 
-Anyone can  register with  stratis address & email, “new wallet contract is generated and associated with this account  (on chain)“.
+Anyone can register with  stratis address & email, “new wallet contract is generated and associated with this account  (on chain)“.
 
 ![](Chraity_request_to_join.png)
 
 Charity submits a request to join ,
 Kyc process is required  including submitting : 
 	
-Charity Registration and/or license  
+- Charity Registration and/or license  
  - Audit Report (if the charity has been operating for more than 2 years)
   - Annual/Activity report
    - Passport copy of the Manager
     - BankAccount
     - Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
 
- admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
+ Admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
 Charity receives a notification for the status update
 
 ![](Request_to_issue_campaign.png)
 
-Charity can issue campaign bu calling IssueCampaign and providing the cap (the amount of money they want get) , and endDate . an new smart contract is created and added to the charity's campaign's list.
-charity owner has to request to publish this campaign submitting some documents  including submitting : 
+Charity can issue campaign by calling IssueCampaign and providing the cap (the amount of money they want get) , and endDate . A new smart contract is created and added to the charity's campaign's list.
+Charity owner has to request to publish this campaign submitting some documents  including submitting : 
 	
-Charity Registration and/or license  
-  Audit Report (if the charity has been operating for more than 2 years)
+- Charity Registration and/or license  
+ -  Audit Report (if the charity has been operating for more than 2 years)
    - Annual/Activity report
    - Passport copy of the Manager,
    -  BankAccount
     -Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
 
 
- admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
-Charity receives a notification for the status update. and if it's approved , campaign is listed in the cmapign explorer so that donor can view and donate. 
+ Admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
+Charity receives a notification for the status update. and if it's approved , campaign is listed in the campaign explorer so that donor can view and donate. 
 
 ![](Donation.png)
 anyone can donate to campaign as long as it's open and hasn't reached the end date. 
