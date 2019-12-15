@@ -1,18 +1,24 @@
 
 Ehsan Donation Smart Contracts
 ====================================================
-
 Overview 
 ---------
+Ehsan Donation scenario shows an example of how to facilitate donation cycle  and increase the trust between donors and charities through blockchain. 
+	
+Contracts 
+------------------
+- RegistrationContract
+- UserWalletContract
+- CampaignContract
 
-Ehsan - Donation scenario shows an example of how to facilitate donation cycle  and increase the trust between donors and charities through blockchain. 
+
 Application Roles 
 ------------------
 
 | Name       | Description                                                                                         |
 |------------|-----------------------------------------------------------------------------------------------------|
 | Admin| A person Who manage and review request from charities. 
-| Charity/      | A charity owner/manager who can issue campaigns after admin reviews and approves his account as well as  the campaign data (one smart contract for each Charity && one smart contract for each Campaign).                                     |
+| Charity      | A charity owner/manager who can issue campaigns after admin reviews and approves his account as well as  the campaign data (one smart contract for each Charity && one smart contract for each Campaign).                                     |
 
 
 UserWalletContract Workflow States 
@@ -37,12 +43,14 @@ CampaignContract Workflow States
 | Opened   | Indicates that the admin has reviews the charity request and approved it and donor can donate                     |
 | Rejected   | Indicates that the admin has reviewed the charity request and rejected it but charity still can resubmit                      |
 | Finished   | Indicates that the campaign has been finished and donor can't donate                |
+
+
 Workflow Details
 ----------------
 
 ![](Registration.png)
 
-Anyone can  register in  based on  stratis address & email, “new wallet contract is generated and associated with this account  (on chain)“.
+Anyone can  register with  stratis address & email, “new wallet contract is generated and associated with this account  (on chain)“.
 
 ![](Chraity_request_to_join.png)
 
@@ -50,11 +58,11 @@ Charity submits a request to join ,
 Kyc process is required  including submitting : 
 	
 Charity Registration and/or license  
-  Audit Report (if the charity has been operating for more than 2 years)
-    Annual/Activity report
-    Passport copy of the Manager
-        BankAccount
-        Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
+ - Audit Report (if the charity has been operating for more than 2 years)
+  - Annual/Activity report
+   - Passport copy of the Manager
+    - BankAccount
+    - Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
 
  admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
 Charity receives a notification for the status update
@@ -66,10 +74,10 @@ charity owner has to request to publish this campaign submitting some documents 
 	
 Charity Registration and/or license  
   Audit Report (if the charity has been operating for more than 2 years)
-    Annual/Activity report
-    Passport copy of the Manager,
-      BankAccount
-        Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
+   - Annual/Activity report
+   - Passport copy of the Manager,
+   -  BankAccount
+    -Cryptocurrencies Address “ for supporting other crypt currencies (not supported yet) “
 
 
  admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept or reject 
