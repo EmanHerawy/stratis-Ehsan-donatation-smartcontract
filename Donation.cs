@@ -9,16 +9,22 @@ public class RegistrationContract : SmartContract
 {
     /// <summary>
     /// The constructor of the class
-    /// Intializing the admin to the sender of the transaction
+    /// Initializing the admin to the sender of the transaction
     /// </summary>
     public RegistrationContract(ISmartContractState smartContractState)
    : base(smartContractState)
     {
         this.Admin = Message.Sender;
     }
-​
+​    /// <summary>
+    /// Events that fires when new account is created
+    /// </summary>
+    public struct RegistrationLog
+    {
+        public Address user;
+    }
     /// <summary>
-    /// Getting the total number of registerd users
+    /// Getting the total number of registered users
     /// </summary>
     public int Index
     {
@@ -26,7 +32,7 @@ public class RegistrationContract : SmartContract
 
     }
     /// <summary>
-    /// Return the user with a spicific index
+    /// Return the user with a specific index
     /// </summary>
     /// <param name="index">the index of the user</param>
     /// <returns>the address of the user</returns>
@@ -41,7 +47,7 @@ public class RegistrationContract : SmartContract
         private set => PersistentState.SetAddress(nameof(Admin), value);
     }
     /// <summary>
-    /// set and get the array of registerd users
+    /// set and get the array of registered users
     /// </summary>
     public Address[] Users
     {
@@ -49,7 +55,7 @@ public class RegistrationContract : SmartContract
         private set => PersistentState.SetArray(nameof(Users), value);
     }
     /// <summary>
-    /// Create a new user node in the network
+    /// Create a new user Account
     /// </summary>
     /// <returns>the address of the created users</returns>
     public Address createAccount()
@@ -57,7 +63,9 @@ public class RegistrationContract : SmartContract
         var createResult = Create<UserWalletContract>(0, new object[] { Message.Sender, this.Admin });
         Assert(createResult.Success);
         Address[] memoryUsers = this.GetArrayCopy(this.Users);
-​
+​        Log(new RegistrationLog { user = createResult.NewContractAddress });
+
+
         memoryUsers[this.Index] = createResult.NewContractAddress;
         Users = memoryUsers;
         return createResult.NewContractAddress;
@@ -100,7 +108,24 @@ public class UserWalletContract : SmartContract
         this.State = (uint)StatusType.Initialized;
     }
     /// <summary>
-    /// The status of the smart contract
+    /// Event that fires when the charity submit KYC data 
+    /// </summary>
+    public struct CharityRequestToJoinLog
+    {
+        public Address Charity;
+    }
+    /// <summary>
+    /// Event that fires when the admin reviews KYC data and approve/reject/banned 
+    /// </summary>
+    public struct AdminManageJoinRequestLog
+    {
+        public Address Charity;
+        public uint status;
+    }
+ 
+
+    /// <summary>
+    /// The status of the Account 
     /// </summary>
     enum StatusType : uint
     {
@@ -178,8 +203,7 @@ public class UserWalletContract : SmartContract
           string AuditReport,
           string Passport,
           string Name,
-​
-          string BankAccount,
+​          string BankAccount,
           Address CryptoAddress)
     {
         Assert(this.Message.Sender == this.Owner);
@@ -192,13 +216,14 @@ public class UserWalletContract : SmartContract
         this.BankAccount = BankAccount;
         this.CryptoAddress = CryptoAddress;
         this.State = (uint)StatusType.Submitted;
+        Log(new CharityRequestToJoinLog { Charity = Message.Sender });
         return true;
     }
     /// <summary>
     /// The admin manges the requests from the users.
     /// </summary>
     /// <param name="status">the status will be given to the request</param>
-    /// <returns>it always return true if succesful</returns>
+    /// <returns>it always return true if successful</returns>
     public bool AdminManageRequestToPublish(uint status)
     {
         Assert(this.Message.Sender == this.Admin);
@@ -206,7 +231,9 @@ public class UserWalletContract : SmartContract
 ​
 ​
             this.State = status;
-​
+  Log(new AdminManageJoinRequestLog{Charity = this.Owner, status = (Authorization)status});
+
+
         return true;
     }
     /// <summary>
@@ -246,7 +273,33 @@ public class UserWalletContract : SmartContract
 /// it contains all the transactions for the Campaign
 /// </summary>
 public class CampaignContract : SmartContract
-{
+{    /// <summary>
+     /// Event that fires when the charity submit KYC data 
+     /// </summary>
+    public struct RequestToPublishLog
+    {
+        public Address owner;
+    }
+    /// <summary>
+    /// Event that fires when the admin reviews KYC data and approve/reject/banned 
+    /// </summary>
+    public struct AdminManageRequestToPublishLog
+    {
+        public bool status;
+    }
+    /// <summary>
+    /// Event that fires when the campaign receives donations  
+    /// </summary>
+    public struct DonateLog
+    {
+        public Address user;
+        public ulong amount;
+    }
+
+
+    /// <summary>
+    /// Enum that indicate the campaign status
+    /// </summary>
     public enum StatusType : uint
     {
         Issued = 0,
@@ -255,18 +308,10 @@ public class CampaignContract : SmartContract
         Opened = 3,
         Finished = 4
     }
-    // this for dao stages
+
+
     /// <summary>
-    /// The three milestones for any campaign 
-    /// </summary>
-    public enum Stages : uint
-    {
-        Stage1 = 0,
-        Stage2 = 1,
-        Stage3 = 2
-    }
-    /// <summary>
-    /// Intializing the campaign contract
+    /// Initializing the campaign contract
     /// </summary>
     /// <param name="smartContractState"></param>
     /// <param name="owner"></param>
@@ -427,6 +472,9 @@ public class CampaignContract : SmartContract
 ​        this.BankAccount = BankAccount;
         this.CryptoAddress = CryptoAddress;
         this.State = (uint)StatusType.Submitted;
+        Log(new RequestToPublishLog { owner = this.Message.Sender });
+
+
         return true;
     }
     /// <summary>
@@ -446,6 +494,9 @@ public class CampaignContract : SmartContract
         {
             this.State = (uint)StatusType.Rejected;
         }
+        Log(new AdminManageRequestToPublishLog { status = status });
+
+
         return true;
     }
     /// <summary>
@@ -459,6 +510,9 @@ public class CampaignContract : SmartContract
         Assert(this.Message.Value > 0);
         Assert(this.TransferTo(this.Message.Sender, this.Message.Value));
         this.TotalSupply += this.Message.Value;
+        Log(new DonateLog { user = this.Message.Sender, amount = this.Message.Value });
+
+
 ​
     }
 ​    
