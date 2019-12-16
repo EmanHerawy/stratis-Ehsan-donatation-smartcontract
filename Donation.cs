@@ -1,22 +1,20 @@
 using Stratis.SmartContracts;
 [Deploy]
-
 /// <summary>
 /// The registration smart contract
 /// it contains all the transactions for the user to register
 /// </summary>
 public class RegistrationContract : SmartContract
-{
-    /// <summary>
-    /// The constructor of the class
-    /// Initializing the admin to the sender of the transaction
-    /// </summary>
+{/// <summary>
+ /// The constructor of the class
+ /// Initializing the admin to the sender of the transaction
+ /// </summary>
     public RegistrationContract(ISmartContractState smartContractState)
    : base(smartContractState)
     {
         this.Admin = Message.Sender;
     }
-​    /// <summary>
+    /// <summary>
     /// Events that fires when new account is created
     /// </summary>
     public struct RegistrationLog
@@ -29,7 +27,7 @@ public class RegistrationContract : SmartContract
     public int Index
     {
         get => this.Users.Length;
-
+        //private set => PersistentState.SetAddress(nameof(Admin), value);
     }
     /// <summary>
     /// Return the user with a specific index
@@ -39,7 +37,7 @@ public class RegistrationContract : SmartContract
     public Address User(int index)
     {
         return this.Users[index];
-
+        //private set => PersistentState.SetAddress(nameof(Admin), value);
     }
     public Address Admin
     {
@@ -63,13 +61,12 @@ public class RegistrationContract : SmartContract
         var createResult = Create<UserWalletContract>(0, new object[] { Message.Sender, this.Admin });
         Assert(createResult.Success);
         Address[] memoryUsers = this.GetArrayCopy(this.Users);
-​        Log(new RegistrationLog { user = createResult.NewContractAddress });
-
-
+        Log(new RegistrationLog { user = createResult.NewContractAddress });
         memoryUsers[this.Index] = createResult.NewContractAddress;
         Users = memoryUsers;
         return createResult.NewContractAddress;
     }
+    // we should avoid this solution as looping is gas consumer
     // we should avoid this solution as looping is gas consumer
     /// <summary>
     /// helper function to copy the content of an array to another array.
@@ -82,13 +79,11 @@ public class RegistrationContract : SmartContract
         for (int i = 0; i < this.Index; i++)
         {
             TempArray[i] = users[i];
-​
+
         }
         return TempArray;
     }
-
 }
-​
 /// <summary>
 /// The smartcontract of the wallet of the user
 /// </summary>
@@ -105,7 +100,6 @@ public class UserWalletContract : SmartContract
     {
         this.Admin = Admin;
         this.Owner = Owner;
-        this.State = (uint)StatusType.Initialized;
     }
     /// <summary>
     /// Event that fires when the charity submit KYC data 
@@ -122,7 +116,7 @@ public class UserWalletContract : SmartContract
         public Address Charity;
         public uint status;
     }
- 
+
 
     /// <summary>
     /// The status of the Account 
@@ -134,6 +128,7 @@ public class UserWalletContract : SmartContract
         Approved = 2, Banned = 3,
         Submitted = 4
     }
+
     public Address Owner
     {
         get => PersistentState.GetAddress(nameof(Owner));
@@ -164,7 +159,7 @@ public class UserWalletContract : SmartContract
         get => PersistentState.GetString(nameof(Passport));
         private set => PersistentState.SetString(nameof(Passport), value);
     }
-​
+
     public string BankAccount
     {
         get => PersistentState.GetString(nameof(BankAccount));
@@ -203,7 +198,8 @@ public class UserWalletContract : SmartContract
           string AuditReport,
           string Passport,
           string Name,
-​          string BankAccount,
+
+          string BankAccount,
           Address CryptoAddress)
     {
         Assert(this.Message.Sender == this.Owner);
@@ -212,11 +208,12 @@ public class UserWalletContract : SmartContract
         this.AuditReport = AuditReport;
         this.Passport = Passport;
         this.Name = Name;
-​
+
         this.BankAccount = BankAccount;
         this.CryptoAddress = CryptoAddress;
         this.State = (uint)StatusType.Submitted;
         Log(new CharityRequestToJoinLog { Charity = Message.Sender });
+
         return true;
     }
     /// <summary>
@@ -228,11 +225,10 @@ public class UserWalletContract : SmartContract
     {
         Assert(this.Message.Sender == this.Admin);
         Assert(status == (uint)StatusType.Approved || status == (uint)StatusType.Rejected || status == (uint)StatusType.Banned);
-​
-​
-            this.State = status;
-  Log(new AdminManageJoinRequestLog{Charity = this.Owner, status = (Authorization)status});
 
+
+        this.State = status;
+        Log(new AdminManageJoinRequestLog { Charity = this.Owner, status = status });
 
         return true;
     }
@@ -251,7 +247,7 @@ public class UserWalletContract : SmartContract
         var createResult = Create<CampaignContract>(0, new object[] { this.Owner, this.Admin, this.Address, Cap, Name, EndDate });
         Assert(createResult.Success);
         Address[] TempArray = this.GetArrayCopy(this.Campaigns);
-​       
+
         TempArray[this.Index] = createResult.NewContractAddress;
         Campaigns = TempArray;
         return createResult.NewContractAddress;
@@ -262,20 +258,21 @@ public class UserWalletContract : SmartContract
         for (int i = 0; i < this.Index; i++)
         {
             TempArray[i] = arr[i];
-​
+
         }
         return TempArray;
     }
 }
-​
-​/// <summary>
+
+/// <summary>
 /// The campaign smart contract
 /// it contains all the transactions for the Campaign
 /// </summary>
 public class CampaignContract : SmartContract
-{    /// <summary>
-     /// Event that fires when the charity submit KYC data 
-     /// </summary>
+{
+    /// <summary>
+    /// Event that fires when the charity submit KYC data 
+    /// </summary>
     public struct RequestToPublishLog
     {
         public Address owner;
@@ -309,7 +306,6 @@ public class CampaignContract : SmartContract
         Finished = 4
     }
 
-
     /// <summary>
     /// Initializing the campaign contract
     /// </summary>
@@ -331,8 +327,8 @@ public class CampaignContract : SmartContract
         this.Cap = Cap;
         this.State = (uint)StatusType.Issued;
     }
-​
-​
+
+
     public Address Owner
     {
         get => PersistentState.GetAddress(nameof(Owner));
@@ -349,7 +345,7 @@ public class CampaignContract : SmartContract
         get => PersistentState.GetAddress(nameof(WalletContract));
         private set => PersistentState.SetAddress(nameof(WalletContract), value);
     }
-​
+
     public string Name
     {
         get => PersistentState.GetString(nameof(Name));
@@ -385,7 +381,7 @@ public class CampaignContract : SmartContract
         get => PersistentState.GetAddress(nameof(CryptoAddress));
         private set => PersistentState.SetAddress(nameof(CryptoAddress), value);
     }
-​
+
     public ulong StartDate
     {
         get => PersistentState.GetUInt64(nameof(StartDate));
@@ -420,7 +416,7 @@ public class CampaignContract : SmartContract
     {
         return PersistentState.GetUInt64($"Balance:{address}");
     }
-​
+
     private void SetBalance(Address address, ulong value)
     {
         PersistentState.SetUInt64($"Balance:{address}", value);
@@ -435,19 +431,18 @@ public class CampaignContract : SmartContract
     {
         if (amount == 0)
         {
-​
-​
+
+
             return false;
         }
-​
+
         //  use checked and unchecked to prevent overflow & or to overflow
         SetBalance(to, checked(GetBalance(to) + amount));
-​
+
         return true;
     }
-
     /// <summary>
-    /// Creating the request to have a campaign 
+    /// Charity owner submit kyc data to publish campaign
     /// </summary>
     /// <param name="Licence"></param>
     /// <param name="AuditReport"></param>
@@ -460,7 +455,7 @@ public class CampaignContract : SmartContract
           string AuditReport,
           string Passport,
           string MangerName,
-​
+
           string BankAccount,
           Address CryptoAddress)
     {
@@ -469,11 +464,11 @@ public class CampaignContract : SmartContract
         this.AuditReport = AuditReport;
         this.Passport = Passport;
         this.MangerName = MangerName;
-​        this.BankAccount = BankAccount;
+
+        this.BankAccount = BankAccount;
         this.CryptoAddress = CryptoAddress;
         this.State = (uint)StatusType.Submitted;
         Log(new RequestToPublishLog { owner = this.Message.Sender });
-
 
         return true;
     }
@@ -481,7 +476,7 @@ public class CampaignContract : SmartContract
     /// The admin manges the requests from the campaigns.
     /// </summary>
     /// <param name="status">the status will be given to the request</param>
-    /// <returns>it always return true if succesful</returns>
+    /// <returns>it always return true if successful</returns>
     public bool AdminManageRequestToPublish(bool status)
     {
         Assert(this.Message.Sender == this.Admin);
@@ -495,7 +490,6 @@ public class CampaignContract : SmartContract
             this.State = (uint)StatusType.Rejected;
         }
         Log(new AdminManageRequestToPublishLog { status = status });
-
 
         return true;
     }
@@ -512,12 +506,9 @@ public class CampaignContract : SmartContract
         this.TotalSupply += this.Message.Value;
         Log(new DonateLog { user = this.Message.Sender, amount = this.Message.Value });
 
-
-​
     }
-​    
     /// <summary>
-    /// Withdrwaing money from the campaign balance
+    /// Withdrawing money from the campaign balance
     /// </summary>
     public bool Withdraw()
     {
@@ -526,20 +517,17 @@ public class CampaignContract : SmartContract
         Assert(this.State == (uint)StatusType.Finished);
         // we will add extra functionality here by implementing dao 
         ITransferResult transferResult = Transfer(this.Owner, this.Balance);
-​
+
         return transferResult.Success;
     }
-​
-}
     /// <summary>
     /// owner close the campaign to withdraw money
     /// </summary>
-    public bool close()
+    public void close()
     {
-    Assert(this.Message.Sender == this.Owner);
+        Assert(this.Message.Sender == this.Owner);
 
-    this.State = (uint)StatusType.Finished;
+        this.State = (uint)StatusType.Finished;
     }
-​
 }
-​
+
