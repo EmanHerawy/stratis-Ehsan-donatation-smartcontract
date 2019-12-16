@@ -96,5 +96,16 @@ Application Files
 [Donation.cs](Donation.cs) - This file contains the code for the 3 contracts .
 
 
-References
+How to use
 -----------------
+- call createAccount in RegistrationContract , it will create new contract and save the contract address in user list
+- to join as a chairty you need to call  RequestToPublish in UserWalletContract and pass the required paprmater 
+-  Admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept/ reject /ban via caling AdminManageRequestToPublish in UserWalletContract
+- Charity can issue campaign by calling IssueCampaign in UserWalletContract and providing the cap (the amount of money they want get) , and endDate . A new smart contract is created and added to the charity's campaign's list.
+-  Charity owner has to request to publish this campaign submitting some documents  via calling  RequestToPublish in CampaignContract and passing the required parms 
+-  Admin receives a notification for new request to be reviewed , after  reviewing KYC and he can accept/ reject /ban via caling AdminManageRequestToPublish in CampaignContract.
+- Charity receives a notification for the status update. and if it's approved , campaign is listed in the campaign explorer so that donor can view and donate. 
+- Anyone can donate to campaign as long as it's open and hasn't reached the end date via calling Donate in in CampaignContract.
+-  Campaign owner can withdraw the donated money to his account from the campaign contract after closing it via calling close then Withdraw in CampaignContract.
+
+
